@@ -9,11 +9,11 @@ app.use(cors());
 app.use(express.json());
 
 // ✅ Serve correttamente la cartella public
-app.use(express.static(path.resolve(__dirname, "../public")));
+app.use(express.static(path.join(__dirname, "public")));
 
 // ✅ Serve index.html
 app.get("/", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../public/index.html"));
+    res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
 // ✅ Serve admin.html
