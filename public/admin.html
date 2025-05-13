@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Pazienti</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        table {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid black;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #f44336;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Lista Pazienti in Attesa</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Cognome</th>
+                <th>Motivo</th>
+                <th>Appuntamento</th>
+                <th>Orario</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody id="listaPazienti"></tbody>
+    </table>
+
+    <script>
+        function aggiornaLista() {
+            fetch("http://192.168.1.78:3000/lista-pazienti")
+            .then(response => response.json())
+            .then(pazienti => {
+                let tabella = document.getElementById("listaPazienti");
+                tabella.innerHTML = "";
+                pazienti.forEach(p => {
+                    let riga = `<tr>
+                        <td>${p.cognome}</td>
+                        <td>${p.motivo}</td>
+                        <td>${p.appuntamento ? 'Sì' : 'No'}</td>
+                        <td>${p.orario}</td>
+                        <td><button onclick="rimuoviPaziente('${p.cognome}')">Rimuovi</button></td>
+                    </tr>`;
+                    tabella.innerHTML += riga;
+                });
+            });
+        }
+
+        function rimuoviPaziente(cognome) {
+            fetch("http://192.168.1.78:3000/rimuovi-paziente", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ cognome })
+            }).then(() => {
+                aggiornaLista();
+            });
+        }
+
+        setInterval(aggiornaLista, 5000);
+        aggiornaLista();
+    </script>
+
+</body>
+</html>

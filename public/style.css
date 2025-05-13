@@ -1,0 +1,44 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+    margin-top: 50px;
+}
+
+h1 {
+    font-size: 28px;
+}
+
+p {
+    font-size: 24px;
+    margin: 20px 0;
+}
+
+.btn {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
+    padding: 15px;
+    font-size: 22px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.verde { background-color: #4CAF50; color: white; }
+.rosso { background-color: #D32F2F; color: white; }
+.blu { background-color: #1976D2; color: white; }
+.giallo { background-color: #FBC02D; color: black; }
+
+.nascosto {
+    display: none;
+}

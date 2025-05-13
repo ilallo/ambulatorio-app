@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Coda Ambulatorio</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        .contenitore {
+            max-width: 90%;
+            margin: auto;
+            padding: 20px;
+            border: 2px solid #000;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin: 10px 0;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+        }
+        .verde { background-color: #4CAF50; color: white; }
+        .rosso { background-color: #f44336; color: white; }
+        .giallo { background-color: #FFC107; font-size: 22px; }
+        .azzurro { background-color: #2196F3; color: white; }
+        .arancione { background-color: #FF5722; color: white; }
+        input {
+            width: 90%;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 22px;
+            text-align: center;
+        }
+        .messaggio {
+            font-size: 28px;
+            font-weight: bold;
+            padding: 50px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+        .qr-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .qr-container img {
+            width: 150px;
+            height: 150px;
+        }
+        .doctolib-link {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="contenitore" id="inizio">
+        <h1>BENVENUTO IN AMBULATORIO</h1>
+        <h2 style="font-size: 40px; margin-top: 20px;">Hai un appuntamento?</h2>
+        <button class="verde" onclick="selezionaAppuntamento(true)">SÌ</button>
+        <button class="rosso" onclick="selezionaAppuntamento(false)">NO<br><span style="font-size: 20px; font-weight: bold; display: block; margin-top: 5px;">MA HO BISOGNO DEL MEDICO</span></button>
+    </div>
+
+    <div class="contenitore" id="inserisci-cognome" style="display:none; position: relative; padding-bottom: 80px;">
+        <h2>Inserisci il tuo cognome</h2>
+        <input type="text" id="cognomeInput" placeholder="Cognome">
+        <button class="azzurro" onclick="confermaCognome()">Conferma</button>
+        <button class="giallo" onclick="tornaIndietro()" style="position: absolute; bottom: 20px; left: 20px; font-size: 16px; padding: 8px 12px;">⬅️ Indietro</button>
+    </div>
+
+    <div class="contenitore" id="scelta-no-appuntamento" style="display:none;">
+        <h2>Per quale motivo sei qui?</h2>
+        <button class="giallo" onclick="selezionaMotivo('Malattia')">Ho bisogno della malattia</button>
+        <button class="arancione" onclick="selezionaMotivo('Prescrizione')">HAI BISOGNO DI UNA PRESCRIZIONE DI FARMACI?</button>
+        <button class="rosso" onclick="selezionaMotivo('Urgenza')">È urgente per un problema di salute</button>
+    </div>
+
+    <div class="contenitore messaggio" id="risposta" style="display:none;"></div>
+
+    <script>
+        let haAppuntamento = false;
+        let motivoScelto = '';
+
+        function selezionaAppuntamento(appuntamento) {
+            haAppuntamento = appuntamento;
+            document.getElementById("inizio").style.display = "none";
+            document.getElementById("inserisci-cognome").style.display = "block";
+        }
+
+        function confermaCognome() {
+            const cognome = document.getElementById("cognomeInput").value.trim();
+            if (cognome === '') {
+                alert("Inserisci il cognome!");
+                return;
+            }
+
+            if (haAppuntamento) {
+                inviaDati(cognome, "Appuntamento");
+                mostraMessaggio("✅ La tua presenza è stata registrata. Attendi in sala d’attesa il tuo turno.", "#4CAF50");
+            } else {
+                document.getElementById("inserisci-cognome").style.display = "none";
+                document.getElementById("scelta-no-appuntamento").style.display = "block";
+            }
+        }
+
+        function selezionaMotivo(motivo) {
+            motivoScelto = motivo;
+            const cognome = document.getElementById("cognomeInput").value.trim();
+            inviaDati(cognome, motivoScelto);
+
+            let messaggio = "";
+            let colore = "";
+
+            if (motivo === "Malattia") {
+                messaggio = "LA TUA PRESENZA È STATA REGISTRATA. ATTENDI IN SALA D'ATTESA. VERRAI CHIAMATO APPENA POSSIBILE.";
+                colore = "#FFC107";
+            } else if (motivo === "Prescrizione") {
+                messaggio = `SCRIVIMI SU <a href="https://www.doctolib.it/medico-di-medicina-generale/ardole-san-marino/ilaria-cavallo" class="doctolib-link" target="_blank">DOCTOLIB</a> 
+                OPPURE LASCIA LA TUA RICHIESTA NELLA CASSETTA IN SALA D'ATTESA.`;
+                colore = "#FF5722";
+            } else if (motivo === "Urgenza") {
+                messaggio = "RESTA IN SALA D'ATTESA. TI FARÒ ENTRARE APPENA POSSIBILE.";
+                colore = "#f44336";
+            }
+
+            document.getElementById("scelta-no-appuntamento").style.display = "none";
+            let rispostaBox = document.getElementById("risposta");
+            rispostaBox.innerHTML = messaggio;
+            rispostaBox.style.backgroundColor = colore;
+            rispostaBox.style.display = "block";
+
+            if (motivo === "Prescrizione") {
+                rispostaBox.innerHTML += `
+                    <div class="qr-container">
+                        <p>Scansiona il QR per accedere a Doctolib:</p>
+                        <img src="/qrcode.jpeg" alt="QR Code Doctolib">
+                    </div>
+                    <button class="azzurro" onclick="tornaAllaHome()">Torna alla schermata principale</button>
+                `;
+            } else {
+                setTimeout(() => location.reload(), 5000);
+            }
+        }
+
+        function inviaDati(cognome, motivo) {
+            fetch("http://192.168.1.78:3000/nuovo-paziente", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ cognome, motivo, appuntamento: haAppuntamento })
+            });
+        }
+
+        function mostraMessaggio(testo, colore) {
+            document.getElementById("inserisci-cognome").style.display = "none";
+            let rispostaBox = document.getElementById("risposta");
+            rispostaBox.innerText = testo;
+            rispostaBox.style.backgroundColor = colore;
+            rispostaBox.style.display = "block";
+            setTimeout(() => location.reload(), 5000);
+        }
+
+        function tornaAllaHome() {
+            location.reload();
+        }
+        function tornaIndietro() {
+    document.getElementById("inserisci-cognome").style.display = "none";
+    document.getElementById("inizio").style.display = "block";
+    document.getElementById("cognomeInput").value = "";
+}
+    </script>
+
+</body>
+</html>
