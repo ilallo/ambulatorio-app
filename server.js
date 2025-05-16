@@ -17,8 +17,8 @@ app.get("/", (req, res) => {
 });
 
 // ✅ Serve admin.html
-app.get("/admin.html", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../public/admin.html"));
+app.get("/admin", (req, res) => {
+    res.sendFile(path.join(__dirname, "public/admin.html"));
 });
 
 // ✅ Serve manualmente qrcode.png (per sicurezza)
